@@ -138,6 +138,16 @@ def create_scatter(df, variable1, variable2):
 
 
 def create_boxplot(df):
+
+    boxplot_win = GraphWin('Create Boxplot', 600, 400)
+    boxplot_win.setBackground('white')
+    boxplot_win.setCoords(0, 0, 30, 20)
+
+    plt.boxplot()
+    plt.title('Boxplot')
+    plt.savefig('boxplot.png')
+    plt.clf()
+
     return None
 
 
