@@ -88,12 +88,19 @@ def create_gui():
     line.setFill('gainsboro')
     line.draw(win)
 
-    adv_plot_title = Text(Point(70, 115), 'Advanced Plots')
+    adv_plot_title = Text(Point(72, 115), 'Advanced Plots')
     adv_plot_title.setStyle('bold')
     adv_plot_title.setSize(20)
     adv_plot_title.draw(win)
 
-    return win, exit_button, selected_variable, submit_button, guide_button, selected_plot, selected_variable2
+    boxplot_button = Rectangle(Point(20, 75), Point(205, 95))
+    boxplot_button.setFill('gainsboro')
+    boxplot_button.draw(win)
+    box_text = Text(Point(112.5, 85), 'CREATE BOXPLOT')
+    box_text.setSize(16)
+    box_text.draw(win)
+
+    return win, exit_button, selected_variable, submit_button, guide_button, selected_plot, selected_variable2, boxplot_button
 
 
 def show_guide(column_names, available_plots):
@@ -130,6 +137,10 @@ def create_scatter(df, variable1, variable2):
     plt.clf()
 
 
+def create_boxplot(df):
+    return None
+
+
 def error_message():
     error_win = GraphWin('Invalid Submission', 400, 100)
     error_win.setBackground('orangered')
@@ -145,7 +156,7 @@ def main():
     column_names = list(df.columns)[:5]
     available_plots = ['histogram', 'scatter']
 
-    win, exit_button, selected_variable, submit_button, guide_button, selected_plot, selected_variable2 = create_gui()
+    win, exit_button, selected_variable, submit_button, guide_button, selected_plot, selected_variable2, boxplot_button = create_gui()
 
     click = win.getMouse()
 
@@ -179,6 +190,10 @@ def main():
 
         if button_clicked(click, guide_button):
             show_guide(column_names, available_plots)
+
+        if button_clicked(click, boxplot_button):
+            create_boxplot(df)
+
 
         click = win.getMouse()
 
