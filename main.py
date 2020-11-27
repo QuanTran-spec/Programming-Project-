@@ -139,37 +139,37 @@ def create_scatter(df, variable1, variable2):
 
 def create_boxplot(df, column_names):
 
-    categories = df['assigned metric'].unique()
-    conditions = df['assigned condition'].unique()
+    categories = ['serendipity', 'popularity', 'diversity']
+    conditions = ['low', 'medium', 'high']
 
     boxplot_win = GraphWin('Create Boxplot', 960, 650)
     boxplot_win.setBackground('white')
     boxplot_win.setCoords(0, 0, 96, 65)
 
-    variables = Text(Point(76, 58), 'Available variables:')
+    variables = Text(Point(76, 58), 'Personality Traits:')
     variables.setStyle('bold')
     variables.setTextColor('gray')
     variables.draw(boxplot_win)
-    for i in range(len(column_names)-3):
+    for i in range(len(column_names)):
         col = Text(Point(76, 55 - (2 * i)), column_names[i])
         col.setTextColor('gray')
         col.draw(boxplot_win)
 
-    movie_category = Text(Point(76, 38), 'Movie Categories:')
+    movie_category = Text(Point(76, 41), 'Movie Categories:')
     movie_category.setStyle('bold')
     movie_category.setTextColor('gray')
     movie_category.draw(boxplot_win)
     for i in range(len(categories)):
-        cat = Text(Point(76, 35 - (2 * i)), categories[i])
+        cat = Text(Point(76, 38 - (2 * i)), categories[i])
         cat.setTextColor('gray')
         cat.draw(boxplot_win)
 
-    available_conditions = Text(Point(76, 20), 'Possible Conditions:')
+    available_conditions = Text(Point(76, 28), 'Possible Conditions:')
     available_conditions.setStyle('bold')
     available_conditions.setTextColor('gray')
     available_conditions.draw(boxplot_win)
     for i in range(len(conditions)):
-        cond = Text(Point(76, 17 - (2*i)), conditions[i])
+        cond = Text(Point(76, 25 - (2*i)), conditions[i])
         cond.setTextColor('gray')
         cond.draw(boxplot_win)
 
@@ -181,6 +181,15 @@ def create_boxplot(df, column_names):
     submit_text.setSize(20)
     submit_text.setTextColor('white')
     submit_text.draw(boxplot_win)
+
+    back_button = Rectangle(Point(67, 5), Point(87, 10))
+    back_button.setFill('gainsboro')
+    back_button.setOutline('black')
+    back_button.draw(boxplot_win)
+    back_text = Text(Point(77, 7.5), 'Back')
+    back_text.setSize(20)
+    back_text.setTextColor('black')
+    back_text.draw(boxplot_win)
 
     # Input Variable
     variable_text = Text(Point(32.5, 55), 'Personality Trait:')
@@ -195,26 +204,56 @@ def create_boxplot(df, column_names):
     category_text = Text(Point(32.5, 41), 'Movie Category:')
     category_text.setSize(20)
     category_text.draw(boxplot_win)
-    selected_category = Entry(Point(32.5, 36), 20)
-    selected_category.setFill('white')
-    selected_category.setSize(20)
-    selected_category.draw(boxplot_win)
+    selected_cat = Entry(Point(32.5, 36), 20)
+    selected_cat.setFill('white')
+    selected_cat.setSize(20)
+    selected_cat.draw(boxplot_win)
 
     # Input Condition
     condition_text = Text(Point(32.5, 27), 'Condition:')
     condition_text.setSize(20)
     condition_text.draw(boxplot_win)
-    selected_condition = Entry(Point(32.5, 22), 20)
-    selected_condition.setFill('white')
-    selected_condition.setSize(20)
-    selected_condition.draw(boxplot_win)
+    selected_cond = Entry(Point(32.5, 22), 20)
+    selected_cond.setFill('white')
+    selected_cond.setSize(20)
+    selected_cond.draw(boxplot_win)
 
-    boxplot_win.getMouse()
+    click = boxplot_win.getMouse()
 
-    # plt.boxplot()
-    # plt.title('Boxplot')
-    # plt.savefig('boxplot.png')
-    # plt.clf()
+    while not button_clicked(click, back_button):
+
+        if button_clicked(click, submit_button):
+
+            selected_trait = selected_variable.getText()
+            selected_category = selected_cat.getText()
+            selected_condition = selected_cond.getText()
+
+            if selected_trait in column_names and selected_category in categories and selected_condition in conditions:
+
+                df = df[[selected_trait, 'assigned metric', 'assigned condition', 'enjoy_watching']]
+                df['trait'] = ['High' if x > sum(df[selected_trait]) / len(df[selected_trait]) else 'Low' for x in
+                               df[selected_trait]]
+
+                df_filtered = df[df['assigned metric'] == selected_category]
+                df_filtered2 = df_filtered[df_filtered['assigned condition'] == selected_condition]
+
+                fig, ax = plt.subplots()
+                df_filtered2.boxplot(column='enjoy_watching', by='trait', ax=ax)
+                fig.suptitle('')
+                plt.title('Boxplot for Movies Rated ' + selected_condition.capitalize() + ' in ' + selected_category.capitalize())
+                plt.xlabel(selected_trait.capitalize())
+                plt.ylabel('Amount Enjoyed by Participant')
+                plt.savefig('boxplot.png')
+                plt.clf()
+
+                boxplot_win.close()
+                break
+
+            else: error_message()
+
+        click = boxplot_win.getMouse()
+
+    boxplot_win.close()
 
 
 def error_message():
@@ -227,6 +266,10 @@ def error_message():
 
 
 def main():
+
+    print('-----------------------------------------------------------')
+    print('Please select the Personality Data CSV file to get started.')
+    print('-----------------------------------------------------------')
 
     df = import_data()
     column_names = list(df.columns)[:5]
@@ -269,6 +312,8 @@ def main():
 
         if button_clicked(click, boxplot_button):
             create_boxplot(df, column_names)
+            box_plot = Image(Point(454, 220), 'boxplot.png')
+            box_plot.draw(win)
 
         click = win.getMouse()
 
