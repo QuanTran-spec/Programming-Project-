@@ -137,18 +137,84 @@ def create_scatter(df, variable1, variable2):
     plt.clf()
 
 
-def create_boxplot(df):
+def create_boxplot(df, column_names):
 
-    boxplot_win = GraphWin('Create Boxplot', 600, 400)
+    categories = df['assigned metric'].unique()
+    conditions = df['assigned condition'].unique()
+
+    boxplot_win = GraphWin('Create Boxplot', 960, 650)
     boxplot_win.setBackground('white')
-    boxplot_win.setCoords(0, 0, 30, 20)
+    boxplot_win.setCoords(0, 0, 96, 65)
 
-    plt.boxplot()
-    plt.title('Boxplot')
-    plt.savefig('boxplot.png')
-    plt.clf()
+    variables = Text(Point(76, 58), 'Available variables:')
+    variables.setStyle('bold')
+    variables.setTextColor('gray')
+    variables.draw(boxplot_win)
+    for i in range(len(column_names)-3):
+        col = Text(Point(76, 55 - (2 * i)), column_names[i])
+        col.setTextColor('gray')
+        col.draw(boxplot_win)
 
-    return None
+    movie_category = Text(Point(76, 38), 'Movie Categories:')
+    movie_category.setStyle('bold')
+    movie_category.setTextColor('gray')
+    movie_category.draw(boxplot_win)
+    for i in range(len(categories)):
+        cat = Text(Point(76, 35 - (2 * i)), categories[i])
+        cat.setTextColor('gray')
+        cat.draw(boxplot_win)
+
+    available_conditions = Text(Point(76, 20), 'Possible Conditions:')
+    available_conditions.setStyle('bold')
+    available_conditions.setTextColor('gray')
+    available_conditions.draw(boxplot_win)
+    for i in range(len(conditions)):
+        cond = Text(Point(76, 17 - (2*i)), conditions[i])
+        cond.setTextColor('gray')
+        cond.draw(boxplot_win)
+
+    submit_button = Rectangle(Point(5, 5), Point(60, 10))
+    submit_button.setFill('steelblue')
+    submit_button.setOutline('steelblue')
+    submit_button.draw(boxplot_win)
+    submit_text = Text(Point(32.5, 7.5), 'Submit')
+    submit_text.setSize(20)
+    submit_text.setTextColor('white')
+    submit_text.draw(boxplot_win)
+
+    # Input Variable
+    variable_text = Text(Point(32.5, 55), 'Personality Trait:')
+    variable_text.setSize(20)
+    variable_text.draw(boxplot_win)
+    selected_variable = Entry(Point(32.5, 50), 20)
+    selected_variable.setFill('white')
+    selected_variable.setSize(20)
+    selected_variable.draw(boxplot_win)
+
+    # Input Category
+    category_text = Text(Point(32.5, 41), 'Movie Category:')
+    category_text.setSize(20)
+    category_text.draw(boxplot_win)
+    selected_category = Entry(Point(32.5, 36), 20)
+    selected_category.setFill('white')
+    selected_category.setSize(20)
+    selected_category.draw(boxplot_win)
+
+    # Input Condition
+    condition_text = Text(Point(32.5, 27), 'Condition:')
+    condition_text.setSize(20)
+    condition_text.draw(boxplot_win)
+    selected_condition = Entry(Point(32.5, 22), 20)
+    selected_condition.setFill('white')
+    selected_condition.setSize(20)
+    selected_condition.draw(boxplot_win)
+
+    boxplot_win.getMouse()
+
+    # plt.boxplot()
+    # plt.title('Boxplot')
+    # plt.savefig('boxplot.png')
+    # plt.clf()
 
 
 def error_message():
@@ -202,8 +268,7 @@ def main():
             show_guide(column_names, available_plots)
 
         if button_clicked(click, boxplot_button):
-            create_boxplot(df)
-
+            create_boxplot(df, column_names)
 
         click = win.getMouse()
 
