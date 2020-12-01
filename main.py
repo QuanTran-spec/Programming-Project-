@@ -230,11 +230,10 @@ def create_boxplot(df, column_names):
 
             if selected_trait in column_names and selected_category in categories and selected_condition in conditions:
 
-                df = df[[selected_trait, 'assigned metric', 'assigned condition', 'enjoy_watching']]
-                df['trait'] = ['High' if x > sum(df[selected_trait]) / len(df[selected_trait]) else 'Low' for x in
-                               df[selected_trait]]
+                df1 = df.copy()
+                df1['trait'] = ['High' if x > sum(df1[selected_trait]) / len(df1[selected_trait]) else 'Low' for x in df1[selected_trait]]
 
-                df_filtered = df[df['assigned metric'] == selected_category]
+                df_filtered = df1[df1['assigned metric'] == selected_category]
                 df_filtered2 = df_filtered[df_filtered['assigned condition'] == selected_condition]
 
                 fig, ax = plt.subplots()
@@ -312,8 +311,11 @@ def main():
 
         if button_clicked(click, boxplot_button):
             create_boxplot(df, column_names)
-            box_plot = Image(Point(454, 220), 'boxplot.png')
-            box_plot.draw(win)
+            try:
+                box_plot = Image(Point(454, 220), 'boxplot.png')
+                box_plot.draw(win)
+            except:
+                pass
 
         click = win.getMouse()
 
