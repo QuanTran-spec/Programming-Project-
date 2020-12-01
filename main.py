@@ -102,6 +102,39 @@ def create_gui():
 
     return win, exit_button, selected_variable, submit_button, guide_button, selected_plot, selected_variable2, boxplot_button
 
+def welcome_window():
+    # Welcome Window Start
+
+    welcome_win = GraphWin('Welcome!', 960, 650)
+    welcome_win.setBackground('white')
+    welcome_win.setCoords(0, 0, 96, 65)
+
+    # Could get this from a text file
+    welcome_script = 'Welcome, traveller!'
+    welcome_text = Text(Point(48, 32.5), welcome_script)
+    welcome_text.draw(welcome_win)
+
+    back_button = Rectangle(Point(20, 5), Point(76, 10))
+    back_button.setFill('gainsboro')
+    back_button.setOutline('black')
+    back_button.draw(welcome_win)
+    back_text = Text(Point(48, 7.5), 'Back')
+    back_text.setSize(20)
+    back_text.setTextColor('black')
+    back_text.draw(welcome_win)
+
+    try:
+
+        click = welcome_win.getMouse()
+
+        while not button_clicked(click, back_button):
+            click = welcome_win.getMouse()
+
+        welcome_win.close()
+
+    except GraphicsError:
+        welcome_win.close()
+    # Welcome Window End
 
 def show_guide(column_names, available_plots):
     guide_win = GraphWin('Guide', 600, 400)
@@ -267,9 +300,7 @@ def error_message():
 
 def main():
 
-    print('-----------------------------------------------------------')
-    print('Please select the Personality Data CSV file to get started.')
-    print('-----------------------------------------------------------')
+    welcome_window()
 
     df = import_data()
     column_names = list(df.columns)[:5]
