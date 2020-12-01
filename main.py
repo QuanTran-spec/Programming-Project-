@@ -8,7 +8,7 @@ plt.style.use('seaborn')
 
 def import_data():
     csv_file = tk.askopenfilename()
-    data = pd.read_csv(csv_file, sep=r'\s*,\s*', header=0)
+    data = pd.read_csv(csv_file, sep=r'\s*,\s*', header=0, engine='python')
     df = data[['openness', 'agreeableness', 'emotional_stability', 'conscientiousness',
            'extraversion', 'assigned metric', 'assigned condition', 'enjoy_watching']]
     return df
@@ -218,41 +218,47 @@ def create_boxplot(df, column_names):
     selected_cond.setSize(20)
     selected_cond.draw(boxplot_win)
 
-    click = boxplot_win.getMouse()
-
-    while not button_clicked(click, back_button):
-
-        if button_clicked(click, submit_button):
-
-            selected_trait = selected_variable.getText()
-            selected_category = selected_cat.getText()
-            selected_condition = selected_cond.getText()
-
-            if selected_trait in column_names and selected_category in categories and selected_condition in conditions:
-
-                df1 = df.copy()
-                df1['trait'] = ['High' if x > sum(df1[selected_trait]) / len(df1[selected_trait]) else 'Low' for x in df1[selected_trait]]
-
-                df_filtered = df1[df1['assigned metric'] == selected_category]
-                df_filtered2 = df_filtered[df_filtered['assigned condition'] == selected_condition]
-
-                fig, ax = plt.subplots()
-                df_filtered2.boxplot(column='enjoy_watching', by='trait', ax=ax)
-                fig.suptitle('')
-                plt.title('Boxplot for Movies Rated ' + selected_condition.capitalize() + ' in ' + selected_category.capitalize())
-                plt.xlabel(selected_trait.capitalize())
-                plt.ylabel('Amount Enjoyed by Participant')
-                plt.savefig('boxplot.png')
-                plt.clf()
-
-                boxplot_win.close()
-                break
-
-            else: error_message()
-
+    try:
         click = boxplot_win.getMouse()
 
-    boxplot_win.close()
+        while not button_clicked(click, back_button):
+
+            if button_clicked(click, submit_button):
+
+                selected_trait = selected_variable.getText()
+                selected_category = selected_cat.getText()
+                selected_condition = selected_cond.getText()
+
+                if selected_trait in column_names and selected_category in categories and selected_condition in conditions:
+
+                    df1 = df.copy()
+                    df1['trait'] = ['High' if x > sum(df1[selected_trait]) / len(df1[selected_trait]) else 'Low' for x in df1[selected_trait]]
+
+                    df_filtered = df1[df1['assigned metric'] == selected_category]
+                    df_filtered2 = df_filtered[df_filtered['assigned condition'] == selected_condition]
+
+                    fig, ax = plt.subplots()
+                    df_filtered2.boxplot(column='enjoy_watching', by='trait', ax=ax)
+                    fig.suptitle('')
+                    plt.title('Boxplot for Movies Rated ' + selected_condition.capitalize() + ' in ' + selected_category.capitalize())
+                    plt.xlabel(selected_trait.capitalize())
+                    plt.ylabel('Amount Enjoyed by Participant')
+                    plt.savefig('boxplot.png')
+                    plt.clf()
+
+                    boxplot_win.close()
+                    return Image(Point(454, 220), 'boxplot.png')
+
+                else: error_message()
+
+            click = boxplot_win.getMouse()
+
+        boxplot_win.close()
+        return None
+
+    except GraphicsError:
+        boxplot_win.close()
+        return None
 
 
 def error_message():
@@ -310,12 +316,9 @@ def main():
             show_guide(column_names, available_plots)
 
         if button_clicked(click, boxplot_button):
-            create_boxplot(df, column_names)
-            try:
-                box_plot = Image(Point(454, 220), 'boxplot.png')
+            box_plot = create_boxplot(df, column_names)
+            if box_plot:
                 box_plot.draw(win)
-            except:
-                pass
 
         click = win.getMouse()
 
