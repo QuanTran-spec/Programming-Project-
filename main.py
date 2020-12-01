@@ -7,6 +7,7 @@ plt.style.use('seaborn')
 
 
 def import_data():
+
     csv_file = tk.askopenfilename()
     data = pd.read_csv(csv_file, sep=r'\s*,\s*', header=0, engine='python')
     df = data[['openness', 'agreeableness', 'emotional_stability', 'conscientiousness',
@@ -105,21 +106,32 @@ def create_gui():
 def welcome_window():
     # Welcome Window Start
 
-    welcome_win = GraphWin('Welcome!', 960, 650)
+    welcome_win = GraphWin('Welcome!', 600, 400)
     welcome_win.setBackground('white')
-    welcome_win.setCoords(0, 0, 96, 65)
+    welcome_win.setCoords(0, 0, 60, 40)
 
     # Could get this from a text file
-    welcome_script = 'Welcome, traveller!'
-    welcome_text = Text(Point(48, 32.5), welcome_script)
+    welcome_heading = 'Welcome to the Personality Dataset Dashboard!'
+    welcome_text = Text(Point(30, 35), welcome_heading)
+    welcome_text.setSize(18)
+    welcome_text.setStyle('bold')
     welcome_text.draw(welcome_win)
 
-    back_button = Rectangle(Point(20, 5), Point(76, 10))
+    welcome_message = 'In this dataset, participants completed the Big Five Personality\ntest, and were given a score on a seven-point scale.\
+ They\nwere then assigned to watch several movies from different categories, \ne.g diversity, with conditions high, medium or low.\
+ Finally,\nthey were asked to rate how much they enjoyed watching the movies\non a scale of 1 to 5.\n\
+\nTo get started, please select the dataset.'
+
+    welcome_text2 = Text(Point(30, 21), welcome_message)
+    welcome_text2.setSize(12)
+    welcome_text2.draw(welcome_win)
+
+    back_button = Rectangle(Point(10, 3), Point(50, 7))
     back_button.setFill('gainsboro')
     back_button.setOutline('black')
     back_button.draw(welcome_win)
-    back_text = Text(Point(48, 7.5), 'Back')
-    back_text.setSize(20)
+    back_text = Text(Point(30, 5), 'Select Dataset')
+    back_text.setSize(14)
     back_text.setTextColor('black')
     back_text.draw(welcome_win)
 
@@ -307,33 +319,36 @@ def main():
 
     welcome_window()
 
-    df = import_data()
-    column_names = list(df.columns)[:5]
-    available_plots = ['histogram', 'scatter']
+    try:
+        df = import_data()
+        column_names = list(df.columns)[:5]
+        available_plots = ['histogram', 'scatter']
 
-    win, exit_button, selected_variable, submit_button, guide_button, selected_plot, selected_variable2, boxplot_button = create_gui()
+        win, exit_button, selected_variable, submit_button, guide_button, selected_plot, selected_variable2, boxplot_button = create_gui()
 
-    click = win.getMouse()
+        click = win.getMouse()
 
-    while not button_clicked(click, exit_button):
+        while not button_clicked(click, exit_button):
 
-        if button_clicked(click, submit_button):
+            if button_clicked(click, submit_button):
 
-            if selected_plot.getText() in available_plots:
+                if selected_plot.getText() in available_plots:
 
-                if selected_variable.getText() in column_names:
+                    if selected_variable.getText() in column_names:
 
-                    if selected_plot.getText() == 'histogram':
-                        create_histogram(df, selected_variable.getText())
-                        histogram = Image(Point(454, 220), 'histogram.png')
-                        histogram.draw(win)
+                        if selected_plot.getText() == 'histogram':
+                            create_histogram(df, selected_variable.getText())
+                            histogram = Image(Point(454, 220), 'histogram.png')
+                            histogram.draw(win)
 
-                    elif selected_variable2.getText() in column_names:
+                        elif selected_variable2.getText() in column_names:
 
-                        if selected_plot.getText() == 'scatter':
-                            create_scatter(df, selected_variable.getText(), selected_variable2.getText())
-                            scatter = Image(Point(454, 220), 'scatter.png')
-                            scatter.draw(win)
+                            if selected_plot.getText() == 'scatter':
+                                create_scatter(df, selected_variable.getText(), selected_variable2.getText())
+                                scatter = Image(Point(454, 220), 'scatter.png')
+                                scatter.draw(win)
+
+                            else: error_message()
 
                         else: error_message()
 
@@ -341,20 +356,20 @@ def main():
 
                 else: error_message()
 
-            else: error_message()
+            if button_clicked(click, guide_button):
+                show_guide(column_names, available_plots)
 
-        if button_clicked(click, guide_button):
-            show_guide(column_names, available_plots)
+            if button_clicked(click, boxplot_button):
+                box_plot = create_boxplot(df, column_names)
+                if box_plot:
+                    box_plot.draw(win)
 
-        if button_clicked(click, boxplot_button):
-            box_plot = create_boxplot(df, column_names)
-            if box_plot:
-                box_plot.draw(win)
+            click = win.getMouse()
 
-        click = win.getMouse()
+        win.close()
 
-    win.close()
-
+    except:
+        print('Sorry the data set you selected was invalid :(')
 
 if __name__ == '__main__':
     main()
