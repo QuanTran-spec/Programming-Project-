@@ -7,7 +7,6 @@ plt.style.use('seaborn')
 
 
 def import_data():
-
     csv_file = tk.askopenfilename()
     data = pd.read_csv(csv_file, sep=r'\s*,\s*', header=0, engine='python')
     df = data[['openness', 'agreeableness', 'emotional_stability', 'conscientiousness',
